@@ -14,6 +14,11 @@ class Request {
    */
   public function handleRequest() {
     $resource = null;
+
+    if ($this->method == 'options') {
+      return new Response(200);
+    }
+
     switch ($this->args[0]) {
       case 'img':
         $resource = new Image($this->args[1]);
