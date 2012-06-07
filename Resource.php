@@ -84,9 +84,6 @@ class Resource {
       // Otherwise, we need to insert it.
       $this->object = $this->collection->insert($object);
     }
-
-    // Return the ID of the resource that was saved.
-    return $this->object['_id']->__toString();
   }
 
   /**
