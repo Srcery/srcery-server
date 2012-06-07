@@ -19,13 +19,16 @@ class Request {
       return new Response(200);
     }
 
-    switch ($this->args[0]) {
-      case 'img':
-        $resource = new Image($this->args[1]);
-        break;
-      case 'inst':
-        $resource = new Instance($this->args[1]);
-        break;
+    // Make sure we have two arguments...
+    if (!empty($this->args[0]) && !empty($this->args[1])) {
+      switch ($this->args[0]) {
+        case 'img':
+          $resource = new Image($this->args[1]);
+          break;
+        case 'inst':
+          $resource = new Instance($this->args[1]);
+          break;
+      }
     }
 
     // Return the resource or 406 if no resource exists...
