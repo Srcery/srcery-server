@@ -4,7 +4,7 @@ class File extends Resource {
     parent::__construct($id);
   }
 
-  protected function get_extension() {
+  protected function get_extension($file) {
     return strtolower(substr($file, strrpos($file, '.') + 1));
   }
 
