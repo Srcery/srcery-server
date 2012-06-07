@@ -22,7 +22,21 @@ class File extends Resource {
   }
 
   public function getPath() {
-    return $this->getFolder() . '/' . $this->id;
+
+    // Make sure the id is not equal to the placeholder.
+    if ($this->id != $this->getPlaceHolder()) {
+
+      // Get the path of this file.
+      $path = $this->getFolder() . '/' . $this->id;
+
+      // Make sure the file exists...
+      if (file_exists($path)) {
+
+        // Return the path.
+        return $path;
+      }
+    }
+    return '';
   }
 
   /**
@@ -78,24 +92,26 @@ class File extends Resource {
     // See if our image upload exists.
     if (array_key_exists($post_name, $_FILES) && $_FILES[$post_name]['error'] == 0) {
 
-      $file = $this->getPath();
+      // Make sure the file path is valid.
+      if ($file = $this->getPath()) {
 
-      // Get the upload.
-      $new_file = $_FILES[$post_name];
+        // Get the upload.
+        $new_file = $_FILES[$post_name];
 
-      // Check to see if this image has the extensions allowed.
-      if (!in_array($this->get_extension($new_file['name']), $allowed_ext)) {
-        return new Response(406, 'Only ' . implode(',', $allowed_ext) . ' files are allowed!');
-      }
+        // Check to see if this image has the extensions allowed.
+        if (!in_array($this->get_extension($new_file['name']), $allowed_ext)) {
+          return new Response(406, 'Only ' . implode(',', $allowed_ext) . ' files are allowed!');
+        }
 
-      // For now just delete the old file.
-      if (file_exists($file)) {
-        unlink($file);
-      }
+        // For now just delete the old file.
+        if (file_exists($file)) {
+          unlink($file);
+        }
 
-      // Now move the image upload to the upload directory.
-      if (move_uploaded_file($new_file['tmp_name'], $file)) {
-        return new Response(200, array('id' => $this->id));
+        // Now move the image upload to the upload directory.
+        if (move_uploaded_file($new_file['tmp_name'], $file)) {
+          return new Response(200, array('id' => $this->id));
+        }
       }
     }
 
