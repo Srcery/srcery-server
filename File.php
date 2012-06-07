@@ -84,7 +84,7 @@ class File extends Resource {
       $new_file = $_FILES[$post_name];
 
       // Check to see if this image has the extensions allowed.
-      if (!in_array(get_file_ext($new_file['name']), $allowed_ext)) {
+      if (!in_array($this->get_extension($new_file['name']), $allowed_ext)) {
         return new Response(406, 'Only ' . implode(',', $allowed_ext) . ' files are allowed!');
       }
 
