@@ -95,7 +95,9 @@ class File extends Resource {
 
       // Now move the image upload to the upload directory.
       if (move_uploaded_file($new_file['tmp_name'], $file)) {
-        return new Response(200, array('id' => $this->id));
+        return new Response(200, array('id' => $this->id), array(
+          'Cache-Control: no-cache, must-revalidate'
+        ));
       }
     }
 
