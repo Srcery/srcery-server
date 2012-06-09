@@ -7,6 +7,8 @@
   Order allow,deny
 </FilesMatch>
 
+Header set Access-Control-Allow-Origin *
+
 # Don't show directory listings for URLs which map to a directory.
 Options -Indexes
 
