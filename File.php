@@ -1,33 +1,19 @@
 <?php
 class File extends Resource {
-  function __construct($id = null) {
-    parent::__construct($id);
-  }
 
-  protected function get_extension($file) {
+  /** Returns the extension of the provided file. */
+  protected function extension($file) {
     return strtolower(substr($file, strrpos($file, '.') + 1));
   }
 
-  public function handleRequest($request) {
-    parent::handleRequest($request);
-    if ($request->method == 'get') {
-      return $this->getFile();
-    }
-    else if ($request->method == 'post') {
-      return $this->setFile($request->args);
-    }
-
-    // Return an error.
-    return new Response(406);
-  }
-
-  public function getPath() {
+  /** The path of the file. */
+  private function path() {
 
     // Make sure the id is not equal to the placeholder.
-    if ($this->id != $this->getPlaceHolder()) {
+    if ($this->id != $this->place_holder()) {
 
       // Get the path of this file.
-      $path = $this->getFolder() . '/' . $this->id;
+      $path = $this->folder() . '/' . $this->id;
 
       // Make sure the file exists...
       if (file_exists($path)) {
@@ -40,28 +26,21 @@ class File extends Resource {
   }
 
   /**
-   * Get the file.
+   * Loads a file.
    * @return Response
    */
-  public function getFile() {
+  public function load() {
 
     // Get the file path.
-    $file = $this->getPath();
-    $save = true;
+    $file = $this->path();
 
     // If the file doesn't exist, then get the placeholder.
     if (!file_exists($file)) {
-      $file = $this->getFolder() . '/' . $this->getPlaceHolder();
-      $save = false;
+      $file = $this->folder() . '/' . $this->place_holder();
     }
 
     // If the file exists, then stream it to the browser.
     if (file_exists($file) && ($fp = fopen($file, 'rb'))) {
-
-      // Make sure we have an entry in the db for this resource.
-      if ($save && empty($this->object['_id'])) {
-        $this->save();
-      }
 
       $response = new Response(200, array(), array(
         'Content-Type: image/png',
@@ -78,28 +57,28 @@ class File extends Resource {
   }
 
   /**
-   * Set the file.
+   * Saves a file.
    * @return Response
    */
-  public function setFile() {
+  public function save() {
 
     // The allowed extensions.
-    $allowed_ext = $this->allowedExtensions();
+    $allowed_ext = $this->allowed_extensions();
 
     // Get the post name of the file.
-    $post_name = $this->postName();
+    $post_name = $this->post_name();
 
     // See if our image upload exists.
     if (array_key_exists($post_name, $_FILES) && $_FILES[$post_name]['error'] == 0) {
 
       // Make sure the file path is valid.
-      if ($file = $this->getPath()) {
+      if ($file = $this->path()) {
 
         // Get the upload.
         $new_file = $_FILES[$post_name];
 
         // Check to see if this image has the extensions allowed.
-        if (!in_array($this->get_extension($new_file['name']), $allowed_ext)) {
+        if (!in_array($this->extension($new_file['name']), $allowed_ext)) {
           return new Response(406, 'Only ' . implode(',', $allowed_ext) . ' files are allowed!');
         }
 
@@ -119,15 +98,29 @@ class File extends Resource {
     return new Response(406);
   }
 
-  public function getFolder() {
+  /**
+   * Deletes a file.
+   * @return type
+   */
+  public function delete() {
+    if ($file = $this->path() && file_exists($file)) {
+      unlink($file);
+    }
+  }
+
+  protected function folder() {
     return 'files';
   }
 
-  public function getPlaceHolder() {
+  protected function place_holder() {
     return '';
   }
 
-  public function getPostName() {
+  protected function allowed_extensions() {
+    return array();
+  }
+
+  protected function post_name() {
     return 'file';
   }
 }

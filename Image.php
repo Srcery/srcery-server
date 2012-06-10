@@ -1,18 +1,18 @@
 <?php
 class Image extends File {
-  public function getFolder() {
+  protected function folder() {
     return 'images';
   }
 
-  public function getPlaceHolder() {
+  protected function place_holder() {
     return 'placeholder.png';
   }
 
-  public function allowedExtensions() {
+  protected function allowed_extensions() {
     return array('jpg', 'jpeg', 'png', 'gif');
   }
 
-  public function postName() {
+  protected function post_name() {
     return 'img';
   }
 }

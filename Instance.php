@@ -1,38 +1,25 @@
 <?php
 class Instance extends Resource {
 
-  // Each instance has a reference to a derivative.
+  /** @see Derivative */
   public $derivative = null;
 
-  // Each instance has a type.
-  public $type = '';
-
-  function __construct($id, $params) {
-    parent::__construct($id);
-    $this->type = $params['type'];
-    switch ($this->type) {
-
-    }
+  function set($params) {
+    parent::set($params);
+    $derivative = !empty($params['derivative']) ? $params['derivative'] : array();
+    $this->derivative = new Derivative($derivative);
   }
 
-  /**
-   * Loads a new instance.
-   */
-  function load() {
-    parent::load();
-
-    // Turn the derivative into an object.
-    $this->derivative = new Derivative($this->derivative);
-  }
-
-  /**
-   * Returns the object to save in database.
-   */
   function get() {
+    // Return this object plus the parameters.
     return array_merge(parent::get(), array(
-      'derivative' => $this->derivative->id,
-      'type' => $this->type,
+      'derivative' => $this->derivative->get(),
     ));
+  }
+
+  function save() {
+    $this->derivative->save();
+    return parent::save();
   }
 }
 ?>

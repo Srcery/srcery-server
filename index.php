@@ -4,9 +4,9 @@ spl_autoload_register(function ($class) {
   include $class . '.php';
 });
 
-// Get a mongodb instance.
+// Get a mongodb instance and point it to the srcery db.
 $mongo = new Mongo('localhost');
-$srcery_db = $mongo->selectDB('srcery');
+$db = $mongo->srcery;
 
 // Get the request object.
 $request = new Request();
