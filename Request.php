@@ -1,11 +1,17 @@
 <?php
 class Request {
-  public $args = array();
+  public $path = array();
   public $method = '';
+  public $query = '';
+  public $args = array();
+
   function __construct() {
-    $this->request = parse_url(ltrim(strtolower(str_replace($_SERVER['SCRIPT_NAME'], '', $_SERVER['REQUEST_URI'])), '/'));
-    $this->path = explode('/', !empty($this->request['path']) ? $this->request['path'] : '');
+    $request = explode('/', $_SERVER['REQUEST_URI']);
+    $scriptName = explode('/', $_SERVER['SCRIPT_NAME']);
+    $this->path = array_map('strtolower', array_values(array_diff($request, $scriptName)));
     $this->method = strtolower($_SERVER['REQUEST_METHOD']);
+    $this->query = parse_url(strtolower($_SERVER['REQUEST_URI']));
+    $this->query = !empty($this->query['query']) ? $this->query['query'] : '';
     $this->args = $this->get_args();
   }
 
@@ -17,7 +23,9 @@ class Request {
     $args = array();
     switch ($this->method) {
       case 'get':
-        parse_str($this->request['query'], $args);
+        if ($this->query) {
+          parse_str($this->query, $args);
+        }
         break;
       case 'post':
         $args = $_POST;
